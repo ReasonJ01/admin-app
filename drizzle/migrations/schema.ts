@@ -1,7 +1,23 @@
-import { pgTable, text, timestamp, foreignKey, unique, boolean } from "drizzle-orm/pg-core"
+import { pgTable, unique, text, boolean, timestamp, foreignKey } from "drizzle-orm/pg-core"
 import { sql } from "drizzle-orm"
 
 
+
+export const user = pgTable("user", {
+	id: text().primaryKey().notNull(),
+	name: text().notNull(),
+	email: text().notNull(),
+	emailVerified: boolean("email_verified").notNull(),
+	image: text(),
+	createdAt: timestamp("created_at", { mode: 'string' }).notNull(),
+	updatedAt: timestamp("updated_at", { mode: 'string' }).notNull(),
+	role: text(),
+	banned: boolean(),
+	banReason: text("ban_reason"),
+	banExpires: timestamp("ban_expires", { mode: 'string' }),
+}, (table) => [
+	unique("user_email_unique").on(table.email),
+]);
 
 export const verification = pgTable("verification", {
 	id: text().primaryKey().notNull(),
@@ -43,6 +59,7 @@ export const session = pgTable("session", {
 	ipAddress: text("ip_address"),
 	userAgent: text("user_agent"),
 	userId: text("user_id").notNull(),
+	impersonatedBy: text("impersonated_by"),
 }, (table) => [
 	foreignKey({
 			columns: [table.userId],
@@ -50,17 +67,4 @@ export const session = pgTable("session", {
 			name: "session_user_id_user_id_fk"
 		}).onDelete("cascade"),
 	unique("session_token_unique").on(table.token),
-]);
-
-export const user = pgTable("user", {
-	id: text().primaryKey().notNull(),
-	name: text().notNull(),
-	email: text().notNull(),
-	emailVerified: boolean("email_verified").notNull(),
-	image: text(),
-	createdAt: timestamp("created_at", { mode: 'string' }).notNull(),
-	updatedAt: timestamp("updated_at", { mode: 'string' }).notNull(),
-	role: text().default('user'),
-}, (table) => [
-	unique("user_email_unique").on(table.email),
 ]);
