@@ -13,12 +13,14 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { authClient } from '@/lib/auth-client';
-import { User } from '@/lib/auth-client';
+import { checkEmailRole } from '@/lib/actions';
+import { useRouter } from 'next/navigation';
 
 export function SignInForm() {
     const [error, setError] = useState<string>('');
     const [loading, setLoading] = useState(false);
     const formRef = useRef<HTMLFormElement>(null);
+    const router = useRouter();
 
     const handleFocus = (e: React.FocusEvent<HTMLInputElement>) => {
         // Wait for virtual keyboard to appear
@@ -36,6 +38,14 @@ export function SignInForm() {
         const email = formData.get('email') as string;
         const password = formData.get('password') as string;
 
+        const { role, error } = await checkEmailRole(email);
+        if (error || role !== "admin") {
+            setError("This app is for administrators only. If you're a customer, please use our booking app instead.");
+            setLoading(false);
+            await authClient.signOut();
+            return;
+        }
+
         try {
             const result = await authClient.signIn.email({
                 email,
@@ -46,18 +56,8 @@ export function SignInForm() {
                 throw new Error(result.error.message);
             }
 
-            const user = result.data.user as User;
-            console.log(result.data);
-            if (user.role !== "admin") {
-                setError("This app is for administrators only. If you're a customer, please use our booking app instead.");
-                setLoading(false);
-                await authClient.signOut()
-                return;
 
-            }
-
-            // Replace the current route to force a remount
-            window.location.href = '/dashboard';
+            router.push('/dashboard');
         } catch (error) {
             setError(error instanceof Error ? error.message : 'An error occurred');
             setLoading(false);

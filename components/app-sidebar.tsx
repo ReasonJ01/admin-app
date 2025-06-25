@@ -1,0 +1,71 @@
+"use client"
+
+import { Calendar, FileText, Home, Search, Settings } from "lucide-react"
+import Link from "next/link"
+import {
+    Sidebar,
+    SidebarContent,
+    SidebarGroup,
+    SidebarGroupContent,
+    SidebarGroupLabel,
+    SidebarMenu,
+    SidebarMenuButton,
+    SidebarMenuItem,
+} from "@/components/ui/sidebar"
+import { usePathname } from "next/navigation";
+
+// Menu items.
+const items = [
+    {
+        title: "Dashboard",
+        url: "/dashboard",
+        icon: Home,
+    },
+    {
+        title: "Appointments",
+        url: "/appointments",
+        icon: Calendar,
+    },
+    {
+        title: "Site Content",
+        url: "/content",
+        icon: FileText,
+    },
+    {
+        title: "Search",
+        url: "#",
+        icon: Search,
+    },
+    {
+        title: "Settings",
+        url: "#",
+        icon: Settings,
+    },
+]
+
+export function AppSidebar() {
+    const pathname = usePathname();
+    return (
+        <Sidebar>
+            <SidebarContent>
+                <SidebarGroup>
+                    <SidebarGroupLabel>Application</SidebarGroupLabel>
+                    <SidebarGroupContent>
+                        <SidebarMenu>
+                            {items.map((item) => (
+                                <SidebarMenuItem key={item.title}>
+                                    <SidebarMenuButton asChild isActive={pathname === item.url}>
+                                        <Link href={item.url}>
+                                            <item.icon />
+                                            <span>{item.title}</span>
+                                        </Link>
+                                    </SidebarMenuButton>
+                                </SidebarMenuItem>
+                            ))}
+                        </SidebarMenu>
+                    </SidebarGroupContent>
+                </SidebarGroup>
+            </SidebarContent>
+        </Sidebar>
+    )
+}
