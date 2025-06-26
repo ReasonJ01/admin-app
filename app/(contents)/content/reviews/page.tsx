@@ -1,7 +1,11 @@
-export default function ReviewsPage() {
+import { ReviewsTable } from "./review-table";
+import { getReviews } from "@/lib/review_actions";
+
+export default async function ReviewsPage() {
+    const reviews = await getReviews();
     return (
         <div>
-            <h1>Reviews</h1>
+            <ReviewsTable reviews={reviews} />
         </div>
     )
 }

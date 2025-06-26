@@ -15,6 +15,13 @@
       "when": 1750931283346,
       "tag": "0001_nice_thunderbolt",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1750953747761,
+      "tag": "0002_curious_iceman",
+      "breakpoints": true
     }
   ]
 }

@@ -50,8 +50,8 @@ function FAQRow({ faq, onEdit, onDelete, onMoveUp, onMoveDown }: FAQRowProps) {
                             </div>
                         </DrawerContent>
                     </Drawer>
-                    <Button variant="outline" size="icon" onClick={() => onDelete && onDelete()}>
-                        <Trash className="h-4 w-4 text-red-500" />
+                    <Button variant="destructive" size="icon" onClick={() => onDelete && onDelete()}>
+                        <Trash className="h-4 w-4" />
                     </Button>
                 </CardAction>
             </CardHeader>

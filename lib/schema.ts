@@ -59,3 +59,14 @@ export const faq = pgTable("faq", {
 	createdAt: timestamp('created_at').$defaultFn(() => /* @__PURE__ */ new Date()),
 	updatedAt: timestamp('updated_at').$defaultFn(() => /* @__PURE__ */ new Date())
 });
+
+export const review = pgTable("review", {
+	id: text('id').primaryKey(),
+	comment: text('comment').notNull(),
+	userId: text('user_id').references(() => user.id, { onDelete: "set null" }),
+	name: text('name'),
+	createdAt: timestamp('created_at').$defaultFn(() => /* @__PURE__ */ new Date()),
+	updatedAt: timestamp('updated_at').$defaultFn(() => /* @__PURE__ */ new Date()),
+	isApproved: boolean('is_approved').default(false).notNull(),
+	reviewDate: timestamp('review_date').$defaultFn(() => /* @__PURE__ */ new Date())
+});
