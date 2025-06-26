@@ -17,7 +17,7 @@ export function RelativeDate({ date, label, className }: RelativeDateProps) {
         <TooltipProvider>
             <Tooltip>
                 <TooltipTrigger asChild>
-                    <span className={`text-sm text-muted-foreground cursor-help ${className}`}>
+                    <span className={`text-sm text-muted-foreground underline decoration-dotted ${className}`}>
                         {label && `${label}: `}{relativeTime}
                     </span>
                 </TooltipTrigger>

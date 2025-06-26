@@ -77,7 +77,7 @@ export function AddFAQForm({ onSuccess }: AddFAQFormProps) {
                         </FormItem>
                     )}
                 />
-                <Button type="submit">Add FAQ</Button>
+                <Button type="submit" className="w-full">Add FAQ</Button>
             </form>
         </Form>
     )

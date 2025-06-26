@@ -74,7 +74,7 @@ export function UpdateFAQForm({ faq: faqData, onSuccess }: UpdateFAQFormProps) {
                         </FormItem>
                     )}
                 />
-                <Button type="submit">Update FAQ</Button>
+                <Button type="submit" className="w-full">Update FAQ</Button>
             </form>
         </Form>
     )

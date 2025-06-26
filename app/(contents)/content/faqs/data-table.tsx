@@ -9,13 +9,14 @@ import {
     RowSelectionState,
 } from "@tanstack/react-table"
 import { Button } from "@/components/ui/button"
-import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet"
+import { Drawer, DrawerContent, DrawerDescription, DrawerHeader, DrawerTitle, DrawerTrigger } from "@/components/ui/drawer"
 import { Card, CardAction, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { RelativeDate } from "@/components/ui/relative-date"
-import { Pencil, Trash } from "lucide-react"
+import { Pencil, Plus, Trash } from "lucide-react"
 import { UpdateFAQForm } from "./update-faq"
 import { faq } from "@/lib/schema"
 import { useRouter } from "next/navigation"
+import { AddFAQForm } from "./add-faq"
 
 type FAQSelect = typeof faq.$inferSelect
 
@@ -49,10 +50,38 @@ export function DataTable<TData extends FAQSelect, TValue>({
         router.refresh()
     }
 
+    const handleAddSuccess = () => {
+        setOpenSheetId(null)
+        // Refresh the page data
+        router.refresh()
+    }
+
     return (
         <div className="space-y-4 w-full">
             <div className="flex items-center justify-center w-full py-2">
                 <div className="flex flex-col gap-2 w-full px-2">
+                    <Drawer open={openSheetId === 'add'} onOpenChange={(open) => setOpenSheetId(open ? 'add' : null)}>
+                        <DrawerTrigger asChild>
+                            <Button variant="outline" size="icon" className="w-full py-6 cursor-pointer">
+                                <Plus className="h-4 w-4" />
+                            </Button>
+                        </DrawerTrigger>
+                        <DrawerContent className="p-6">
+                            <DrawerHeader>
+                                <DrawerTitle>Add FAQ</DrawerTitle>
+                                <DrawerDescription>
+                                    Add a new FAQ to the list.
+                                </DrawerDescription>
+                            </DrawerHeader>
+                            <div className="flex justify-center items-start">
+                                <div className="w-full max-w-md">
+                                    <AddFAQForm onSuccess={handleAddSuccess} />
+                                </div>
+                            </div>
+                        </DrawerContent>
+                    </Drawer>
+
+
                     {
                         table.getRowModel().rows.map((row) => (
                             <Card key={row.id}>
@@ -61,24 +90,26 @@ export function DataTable<TData extends FAQSelect, TValue>({
                                         {row.original.question}
                                     </CardTitle>
                                     <CardAction className="flex items-center gap-4">
-                                        <Sheet open={openSheetId === row.id} onOpenChange={(open) => setOpenSheetId(open ? row.id : null)}>
-                                            <SheetTrigger asChild>
+                                        <Drawer open={openSheetId === row.id} onOpenChange={(open) => setOpenSheetId(open ? row.id : null)}>
+                                            <DrawerTrigger asChild>
                                                 <Button variant="outline" size="icon">
                                                     <Pencil className="h-4 w-4" />
                                                 </Button>
-                                            </SheetTrigger>
-                                            <SheetContent side="bottom" className="h-[80vh]">
-                                                <SheetHeader>
-                                                    <SheetTitle>Edit FAQ</SheetTitle>
-                                                    <SheetDescription>
+                                            </DrawerTrigger>
+                                            <DrawerContent className="p-6">
+                                                <DrawerHeader>
+                                                    <DrawerTitle>Edit FAQ</DrawerTitle>
+                                                    <DrawerDescription>
                                                         Update the question and answer for this FAQ.
-                                                    </SheetDescription>
-                                                </SheetHeader>
-                                                <div className="mt-6 px-2">
-                                                    <UpdateFAQForm faq={row.original} onSuccess={handleUpdateSuccess} />
+                                                    </DrawerDescription>
+                                                </DrawerHeader>
+                                                <div className="flex justify-center items-start">
+                                                    <div className="w-full max-w-md">
+                                                        <UpdateFAQForm faq={row.original} onSuccess={handleUpdateSuccess} />
+                                                    </div>
                                                 </div>
-                                            </SheetContent>
-                                        </Sheet>
+                                            </DrawerContent>
+                                        </Drawer>
                                         <Button variant="outline" size="icon">
                                             <Trash className="h-4 w-4 text-red-500" />
                                         </Button>
