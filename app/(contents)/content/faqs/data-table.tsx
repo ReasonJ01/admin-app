@@ -62,7 +62,7 @@ export function DataTable<TData extends FAQSelect, TValue>({
                 <div className="flex flex-col gap-2 w-full px-2">
                     <Drawer open={openSheetId === 'add'} onOpenChange={(open) => setOpenSheetId(open ? 'add' : null)}>
                         <DrawerTrigger asChild>
-                            <Button variant="outline" size="icon" className="w-full py-6 cursor-pointer">
+                            <Button variant="outline" className="w-full py-6 cursor-pointer">
                                 <Plus className="h-4 w-4" />
                             </Button>
                         </DrawerTrigger>
