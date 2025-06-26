@@ -2,6 +2,10 @@ import { DataTable } from "./data-table";
 import { getFaqs } from "@/lib/actions";
 import { columns } from "./columns";
 
+// Force dynamic rendering to prevent caching
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 export default async function FAQsPage() {
     const result = await getFaqs();
 

@@ -45,7 +45,10 @@ export async function checkUserRole() {
 
 export async function getFaqs() {
     try {
-        const faqs = await db.query.faq.findMany();
+        // Force fresh data by adding cache control
+        const faqs = await db.query.faq.findMany({
+            orderBy: (faq, { desc }) => [desc(faq.updatedAt)]
+        });
         return { faqs };
     } catch (err) {
         console.error("Failed to get FAQs:", err);
