@@ -20,7 +20,7 @@ const formSchema = z.object({
 
 interface UpdateFAQFormProps {
     faq: typeof faq.$inferSelect;
-    onSuccess?: () => void;
+    onSuccess?: (id: string, values: z.infer<typeof formSchema>) => void;
 }
 
 export function UpdateFAQForm({ faq: faqData, onSuccess }: UpdateFAQFormProps) {
@@ -35,7 +35,7 @@ export function UpdateFAQForm({ faq: faqData, onSuccess }: UpdateFAQFormProps) {
     async function onSubmit(values: z.infer<typeof formSchema>) {
         const result = await updateFAQ(faqData.id, values.question, values.answer)
         if (!result.error) {
-            onSuccess?.()
+            onSuccess?.(faqData.id, values)
         }
     }
 

@@ -1,40 +1,101 @@
 "use client"
 
 import * as React from "react"
-import {
-    ColumnDef,
-    getCoreRowModel,
-    useReactTable,
-    getPaginationRowModel,
-    RowSelectionState,
-} from "@tanstack/react-table"
+import { getCoreRowModel, useReactTable, getPaginationRowModel, RowSelectionState, ColumnDef } from "@tanstack/react-table"
 import { Button } from "@/components/ui/button"
 import { Drawer, DrawerContent, DrawerDescription, DrawerHeader, DrawerTitle, DrawerTrigger } from "@/components/ui/drawer"
 import { Card, CardAction, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { RelativeDate } from "@/components/ui/relative-date"
-import { Pencil, Plus, Trash } from "lucide-react"
+import { ArrowDown, ArrowUp, Pencil, Plus, Trash } from "lucide-react"
 import { UpdateFAQForm } from "./update-faq"
 import { faq } from "@/lib/schema"
-import { useRouter } from "next/navigation"
 import { AddFAQForm } from "./add-faq"
+import { motion, AnimatePresence } from "motion/react"
+import { deleteFAQ } from "@/lib/actions"
 
 type FAQSelect = typeof faq.$inferSelect
 
-interface DataTableProps<TData extends FAQSelect, TValue> {
-    columns: ColumnDef<TData, TValue>[]
-    data: TData[]
+interface FAQRowProps {
+    faq: FAQSelect;
+    onEdit?: (updates: Partial<FAQSelect>) => void;
+    onDelete?: () => void;
+    onMoveUp?: () => void;
+    onMoveDown?: () => void;
 }
 
-export function DataTable<TData extends FAQSelect, TValue>({
-    columns,
-    data,
-}: DataTableProps<TData, TValue>) {
-    const [rowSelection, setRowSelection] = React.useState<RowSelectionState>({})
-    const [openSheetId, setOpenSheetId] = React.useState<string | null>(null)
-    const router = useRouter()
+function FAQRow({ faq, onEdit, onDelete, onMoveUp, onMoveDown }: FAQRowProps) {
+    const [open, setOpen] = React.useState(false)
+    return (
+        <Card key={faq.id}>
+            <CardHeader>
+                <CardTitle>{faq.question}</CardTitle>
+                <CardAction className="flex items-center gap-4">
+                    <Drawer open={open} onOpenChange={setOpen}>
+                        <DrawerTrigger asChild>
+                            <Button variant="outline" size="icon">
+                                <Pencil className="h-4 w-4" />
+                            </Button>
+                        </DrawerTrigger>
+                        <DrawerContent className="p-6">
+                            <DrawerHeader>
+                                <DrawerTitle>Edit FAQ</DrawerTitle>
+                                <DrawerDescription>
+                                    Update the question and answer for this FAQ.
+                                </DrawerDescription>
+                            </DrawerHeader>
+                            <div className="flex justify-center items-start">
+                                <div className="w-full max-w-md">
+                                    <UpdateFAQForm faq={faq} onSuccess={(id, updates) => { setOpen(false); onEdit?.(updates); }} />
+                                </div>
+                            </div>
+                        </DrawerContent>
+                    </Drawer>
+                    <Button variant="outline" size="icon" onClick={() => onDelete && onDelete()}>
+                        <Trash className="h-4 w-4 text-red-500" />
+                    </Button>
+                </CardAction>
+            </CardHeader>
+            <CardContent>
+                <p>{faq.answer}</p>
+            </CardContent>
+            {(() => {
+                const date = faq.updatedAt || faq.createdAt;
+                const label = faq.updatedAt ? 'Updated' : 'Created';
+                return date ? (
+                    <CardFooter className="flex justify-between">
+                        <RelativeDate date={date} label={label} />
+                        <div className="flex items-center gap-2">
+                            <Button variant="outline" size="icon" onClick={() => onMoveUp && onMoveUp()}>
+                                <ArrowUp className="h-4 w-4" />
+                            </Button>
+                            <Button variant="outline" size="icon" onClick={() => onMoveDown && onMoveDown()}>
+                                <ArrowDown className="h-4 w-4" />
+                            </Button>
+                        </div>
 
+                    </CardFooter>
+                ) : null;
+            })()}
+        </Card>
+    )
+}
+
+interface DataTableProps {
+    columns: ColumnDef<FAQSelect, unknown>[];
+    data: FAQSelect[];
+}
+
+export function DataTable({
+    columns,
+    data: initialData,
+}: DataTableProps) {
+    const [faqs, setFaqs] = React.useState<FAQSelect[]>(initialData)
+    const [openSheetId, setOpenSheetId] = React.useState<string | null>(null)
+    const [rowSelection, setRowSelection] = React.useState<RowSelectionState>({})
+
+    // Table instance for selection, pagination, etc.
     const table = useReactTable({
-        data,
+        data: faqs,
         columns,
         getCoreRowModel: getCoreRowModel(),
         getPaginationRowModel: getPaginationRowModel(),
@@ -44,16 +105,30 @@ export function DataTable<TData extends FAQSelect, TValue>({
         },
     })
 
-    const handleUpdateSuccess = () => {
-        setOpenSheetId(null)
-        // Refresh the page data
-        router.refresh()
+    // Optimistic update helpers
+    const updateFAQ = (id: string, updates: Partial<FAQSelect>) => {
+        setFaqs(faqs => faqs.map(faq => faq.id === id ? { ...faq, ...updates } : faq))
+        // TODO: Call server in background
+    }
+    const addFAQ = (newFaq: FAQSelect) => {
+        setFaqs(faqs => [newFaq, ...faqs])
+        // TODO: Call server in background
+    }
+    const removeFAQ = (id: string) => {
+        setFaqs(faqs => faqs.filter(faq => faq.id !== id))
+        // TODO: Call server in background
     }
 
-    const handleAddSuccess = () => {
+    // Add FAQ handler
+    const handleAddSuccess = (newFaq: FAQSelect) => {
+        addFAQ(newFaq)
         setOpenSheetId(null)
-        // Refresh the page data
-        router.refresh()
+    }
+
+    // Edit FAQ handler
+    const handleEditSuccess = (id: string, updates: Partial<FAQSelect>) => {
+        updateFAQ(id, updates)
+        setOpenSheetId(null)
     }
 
     return (
@@ -80,59 +155,28 @@ export function DataTable<TData extends FAQSelect, TValue>({
                             </div>
                         </DrawerContent>
                     </Drawer>
-
-
-                    {
-                        table.getRowModel().rows.map((row) => (
-                            <Card key={row.id}>
-                                <CardHeader>
-                                    <CardTitle>
-                                        {row.original.question}
-                                    </CardTitle>
-                                    <CardAction className="flex items-center gap-4">
-                                        <Drawer open={openSheetId === row.id} onOpenChange={(open) => setOpenSheetId(open ? row.id : null)}>
-                                            <DrawerTrigger asChild>
-                                                <Button variant="outline" size="icon">
-                                                    <Pencil className="h-4 w-4" />
-                                                </Button>
-                                            </DrawerTrigger>
-                                            <DrawerContent className="p-6">
-                                                <DrawerHeader>
-                                                    <DrawerTitle>Edit FAQ</DrawerTitle>
-                                                    <DrawerDescription>
-                                                        Update the question and answer for this FAQ.
-                                                    </DrawerDescription>
-                                                </DrawerHeader>
-                                                <div className="flex justify-center items-start">
-                                                    <div className="w-full max-w-md">
-                                                        <UpdateFAQForm faq={row.original} onSuccess={handleUpdateSuccess} />
-                                                    </div>
-                                                </div>
-                                            </DrawerContent>
-                                        </Drawer>
-                                        <Button variant="outline" size="icon">
-                                            <Trash className="h-4 w-4 text-red-500" />
-                                        </Button>
-                                    </CardAction>
-                                </CardHeader>
-                                <CardContent>
-                                    <p>{row.original.answer}</p>
-                                </CardContent>
-                                {
-                                    (() => {
-                                        const date = row.original.updatedAt || row.original.createdAt;
-                                        const label = row.original.updatedAt ? 'Updated' : 'Created';
-
-                                        return date ? (
-                                            <CardFooter>
-                                                <RelativeDate date={date} label={label} />
-                                            </CardFooter>
-                                        ) : null;
-                                    })()
-                                }
-                            </Card>
-                        ))
-                    }
+                    {/* Render each FAQ as a row component */}
+                    <AnimatePresence>
+                        {table.getRowModel().rows.map(row => (
+                            <motion.div
+                                key={row.original.id}
+                                initial={{ opacity: 0, y: -20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                exit={{ opacity: 0, y: 20 }}
+                                transition={{ duration: 0.25 }}
+                                layout
+                            >
+                                <FAQRow
+                                    faq={row.original}
+                                    onEdit={(updates) => handleEditSuccess(row.original.id, updates)}
+                                    onDelete={() => {
+                                        removeFAQ(row.original.id);
+                                        deleteFAQ([row.original.id]);
+                                    }}
+                                />
+                            </motion.div>
+                        ))}
+                    </AnimatePresence>
                 </div>
             </div>
         </div>

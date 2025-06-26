@@ -4,9 +4,13 @@ import { Button } from "@/components/ui/button"
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Textarea } from "@/components/ui/textarea"
 import { addFAQ } from "@/lib/actions"
+import { faq } from "@/lib/schema"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
+
+type FAQSelect = typeof faq.$inferSelect;
+
 
 const formSchema = z.object({
     question: z.string().min(1, {
@@ -18,11 +22,10 @@ const formSchema = z.object({
 })
 
 interface AddFAQFormProps {
-    onSuccess?: () => void;
+    onSuccess?: (faq: FAQSelect) => void;
 }
 
 export function AddFAQForm({ onSuccess }: AddFAQFormProps) {
-    // 1. Define your form.
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
         defaultValues: {
@@ -31,14 +34,12 @@ export function AddFAQForm({ onSuccess }: AddFAQFormProps) {
         },
     })
 
-    // 2. Define a submit handler.
     async function onSubmit(values: z.infer<typeof formSchema>) {
-        // Do something with the form values.
-        // ✅ This will be type-safe and validated.
+
         const result = await addFAQ(values.question, values.answer)
         if (!result.error) {
             form.reset()
-            onSuccess?.()
+            onSuccess?.(result.newFAQ?.[0] as FAQSelect)
         }
     }
 
