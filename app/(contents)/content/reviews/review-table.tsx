@@ -136,10 +136,12 @@ export function ReviewsTable({ reviews: initialData }: ReviewsTableProps) {
 
     const handleEditSuccess = (id: string, updates: Partial<ReviewSelect>) => {
         setReviews(reviews.map(review => review.id === id ? { ...review, ...updates } : review))
+        setOpenSheetId(null)
     }
 
     const handleAddSuccess = (review: ReviewSelect) => {
         setReviews([...reviews, review])
+        setOpenSheetId(null)
     }
 
     return (
