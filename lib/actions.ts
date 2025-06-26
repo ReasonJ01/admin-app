@@ -47,7 +47,7 @@ export async function getFaqs() {
     try {
         // Force fresh data by adding cache control
         const faqs = await db.query.faq.findMany({
-            orderBy: (faq, { desc }) => [desc(faq.updatedAt)]
+            orderBy: (faq, { asc }) => [asc(faq.order)]
         });
         return { faqs };
     } catch (err) {
@@ -57,15 +57,21 @@ export async function getFaqs() {
 }
 
 export async function addFAQ(question: string, answer: string) {
-    const faqToInsert = {
-        id: crypto.randomUUID(),
-        question,
-        answer,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-    }
-
     try {
+        // Get the highest order value to calculate the next one
+        const maxOrderResult = await db.select({ maxOrder: faq.order }).from(faq);
+        const maxOrder = maxOrderResult.length > 0 ? Math.max(...maxOrderResult.map(r => r.maxOrder)) : 0;
+        const nextOrder = maxOrder + 1;
+
+        const faqToInsert = {
+            id: crypto.randomUUID(),
+            question,
+            answer,
+            order: nextOrder,
+            createdAt: new Date(),
+            updatedAt: new Date(),
+        }
+
         const newFAQ = await db.insert(faq).values(faqToInsert).returning()
         return { newFAQ };
     } catch (err) {
@@ -98,5 +104,26 @@ export async function updateFAQ(id: string, question: string, answer: string) {
     } catch (err) {
         console.error("Failed to update FAQ:", err);
         return { error: "Failed to update FAQ" };
+    }
+}
+
+export async function updateFAQOrder(updates: { id: string; order: number }[]) {
+    try {
+        // Use a transaction to update all FAQs atomically
+        const results = await db.transaction(async (tx) => {
+            const updatePromises = updates.map(({ id, order }) =>
+                tx.update(faq)
+                    .set({ order })
+                    .where(eq(faq.id, id))
+                    .returning()
+            );
+
+            return await Promise.all(updatePromises);
+        });
+
+        return { updatedFAQs: results.flat() };
+    } catch (err) {
+        console.error("Failed to update FAQ order:", err);
+        return { error: "Failed to update FAQ order" };
     }
 }

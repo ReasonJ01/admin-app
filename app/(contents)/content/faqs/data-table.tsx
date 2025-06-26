@@ -11,7 +11,7 @@ import { UpdateFAQForm } from "./update-faq"
 import { faq } from "@/lib/schema"
 import { AddFAQForm } from "./add-faq"
 import { motion, AnimatePresence } from "motion/react"
-import { deleteFAQ } from "@/lib/actions"
+import { deleteFAQ, updateFAQOrder } from "@/lib/actions"
 
 type FAQSelect = typeof faq.$inferSelect
 
@@ -93,7 +93,6 @@ export function DataTable({
     const [openSheetId, setOpenSheetId] = React.useState<string | null>(null)
     const [rowSelection, setRowSelection] = React.useState<RowSelectionState>({})
 
-    // Table instance for selection, pagination, etc.
     const table = useReactTable({
         data: faqs,
         columns,
@@ -105,34 +104,65 @@ export function DataTable({
         },
     })
 
-    // Optimistic update helpers
     const updateFAQ = (id: string, updates: Partial<FAQSelect>) => {
         setFaqs(faqs => faqs.map(faq => faq.id === id ? { ...faq, ...updates } : faq))
-        // TODO: Call server in background
     }
     const addFAQ = (newFaq: FAQSelect) => {
-        setFaqs(faqs => [newFaq, ...faqs])
-        // TODO: Call server in background
+        const maxOrder = Math.max(...faqs.map(faq => faq.order || 0), 0);
+        const optimisticFaq = {
+            ...newFaq,
+            order: maxOrder + 1
+        };
+
+        setFaqs(faqs => [optimisticFaq, ...faqs])
     }
     const removeFAQ = (id: string) => {
         setFaqs(faqs => faqs.filter(faq => faq.id !== id))
-        // TODO: Call server in background
     }
 
-    // Add FAQ handler
     const handleAddSuccess = (newFaq: FAQSelect) => {
         addFAQ(newFaq)
         setOpenSheetId(null)
     }
 
-    // Edit FAQ handler
     const handleEditSuccess = (id: string, updates: Partial<FAQSelect>) => {
         updateFAQ(id, updates)
         setOpenSheetId(null)
     }
 
+    const moveFAQ = async (id: string, direction: 'up' | 'down') => {
+        const currentIndex = faqs.findIndex(faq => faq.id === id);
+        if (currentIndex === -1) return;
+
+        const newIndex = direction === 'up' ? currentIndex - 1 : currentIndex + 1;
+        if (newIndex < 0 || newIndex >= faqs.length) return;
+
+        const currentFAQ = faqs[currentIndex];
+        const targetFAQ = faqs[newIndex];
+
+        setFaqs(faqs => {
+            const newFaqs = faqs.map(faq => ({ ...faq }));
+            const updatedCurrentFAQ = newFaqs[currentIndex];
+            const updatedTargetFAQ = newFaqs[newIndex];
+
+            const tempOrder = updatedCurrentFAQ.order;
+            updatedCurrentFAQ.order = updatedTargetFAQ.order;
+            updatedTargetFAQ.order = tempOrder;
+
+            return newFaqs.sort((a, b) => a.order - b.order);
+        });
+
+        // Send update to server
+        updateFAQOrder([
+            { id: currentFAQ.id, order: targetFAQ.order },
+            { id: targetFAQ.id, order: currentFAQ.order }
+        ]);
+    }
+
     return (
         <div className="space-y-4 w-full">
+
+
             <div className="flex items-center justify-center w-full py-2">
                 <div className="flex flex-col gap-2 w-full px-2">
                     <Drawer open={openSheetId === 'add'} onOpenChange={(open) => setOpenSheetId(open ? 'add' : null)}>
@@ -155,7 +185,6 @@ export function DataTable({
                             </div>
                         </DrawerContent>
                     </Drawer>
-                    {/* Render each FAQ as a row component */}
                     <AnimatePresence>
                         {table.getRowModel().rows.map(row => (
                             <motion.div
@@ -172,6 +201,13 @@ export function DataTable({
                                     onDelete={() => {
                                         removeFAQ(row.original.id);
                                         deleteFAQ([row.original.id]);
+
+                                    }}
+                                    onMoveUp={() => {
+                                        moveFAQ(row.original.id, 'up');
+                                    }}
+                                    onMoveDown={() => {
+                                        moveFAQ(row.original.id, 'down');
                                     }}
                                 />
                             </motion.div>

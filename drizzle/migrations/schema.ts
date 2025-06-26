@@ -1,4 +1,4 @@
-import { pgTable, unique, text, boolean, timestamp, foreignKey } from "drizzle-orm/pg-core"
+import { pgTable, unique, text, boolean, timestamp, foreignKey, integer } from "drizzle-orm/pg-core"
 import { sql } from "drizzle-orm"
 
 
@@ -11,7 +11,7 @@ export const user = pgTable("user", {
 	image: text(),
 	createdAt: timestamp("created_at", { mode: 'string' }).notNull(),
 	updatedAt: timestamp("updated_at", { mode: 'string' }).notNull(),
-	role: text(),
+	role: text().default('user'),
 	banned: boolean(),
 	banReason: text("ban_reason"),
 	banExpires: timestamp("ban_expires", { mode: 'string' }),
@@ -68,3 +68,12 @@ export const session = pgTable("session", {
 		}).onDelete("cascade"),
 	unique("session_token_unique").on(table.token),
 ]);
+
+export const faq = pgTable("faq", {
+	id: text().primaryKey().notNull(),
+	question: text().notNull(),
+	answer: text().notNull(),
+	createdAt: timestamp("created_at", { mode: 'string' }),
+	updatedAt: timestamp("updated_at", { mode: 'string' }),
+	order: integer().default(0).notNull(),
+});

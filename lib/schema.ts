@@ -55,7 +55,7 @@ export const faq = pgTable("faq", {
 	id: text('id').primaryKey(),
 	question: text('question').notNull(),
 	answer: text('answer').notNull(),
-	order: serial('order').notNull(),
+	order: integer('order').default(0).notNull(),
 	createdAt: timestamp('created_at').$defaultFn(() => /* @__PURE__ */ new Date()),
 	updatedAt: timestamp('updated_at').$defaultFn(() => /* @__PURE__ */ new Date())
 });
