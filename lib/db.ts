@@ -4,4 +4,7 @@ import * as schema from "./schema";
 import "dotenv/config";
 
 const client = postgres(process.env.DATABASE_URL!);
-export const db = drizzle(client, { schema }); 
+export const db = drizzle(client, { schema });
+
+// Add type export for better TypeScript support
+export type Database = typeof db; 

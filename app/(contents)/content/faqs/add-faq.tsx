@@ -72,7 +72,7 @@ export function AddFAQForm({ onSuccess }: AddFAQFormProps) {
                                 <Textarea {...field} rows={3} />
                             </FormControl>
                             <FormDescription>
-                                This is the answer that will be displayed to the user.
+                                This is the answer that will be displayed to the user. You can add links in the answer using the following format: [link text](url).
                             </FormDescription>
                             <FormMessage />
                         </FormItem>

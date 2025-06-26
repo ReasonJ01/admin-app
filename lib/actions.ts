@@ -5,6 +5,7 @@ import { faq, user } from "@/lib/schema";
 import { eq, inArray } from "drizzle-orm";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
+import { revalidateTag } from "next/cache";
 
 export async function checkEmailRole(email: string) {
     try {
@@ -73,6 +74,7 @@ export async function addFAQ(question: string, answer: string) {
         }
 
         const newFAQ = await db.insert(faq).values(faqToInsert).returning()
+        revalidateTag("faqs");
         return { newFAQ };
     } catch (err) {
         console.error("Failed to add FAQ:", err);
@@ -83,6 +85,7 @@ export async function addFAQ(question: string, answer: string) {
 export async function deleteFAQ(ids: string[]) {
     try {
         await db.delete(faq).where(inArray(faq.id, ids))
+        revalidateTag("faqs");
     } catch (err) {
         console.error("Failed to delete FAQs:", err);
         return { error: "Failed to delete FAQs" };
@@ -100,6 +103,7 @@ export async function updateFAQ(id: string, question: string, answer: string) {
             .where(eq(faq.id, id))
             .returning();
 
+        revalidateTag("faqs");
         return { updatedFAQ: updatedFAQ[0] };
     } catch (err) {
         console.error("Failed to update FAQ:", err);
@@ -121,6 +125,7 @@ export async function updateFAQOrder(updates: { id: string; order: number }[]) {
             return await Promise.all(updatePromises);
         });
 
+        revalidateTag("faqs");
         return { updatedFAQs: results.flat() };
     } catch (err) {
         console.error("Failed to update FAQ order:", err);
