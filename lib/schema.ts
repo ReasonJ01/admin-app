@@ -70,3 +70,10 @@ export const review = pgTable("review", {
 	isApproved: boolean('is_approved').default(false).notNull(),
 	reviewDate: timestamp('review_date').$defaultFn(() => /* @__PURE__ */ new Date())
 });
+
+export const image = pgTable("image", {
+	id: text('id').primaryKey(),
+	url: text('url').notNull(),
+	createdAt: timestamp('created_at').$defaultFn(() => /* @__PURE__ */ new Date()),
+	updatedAt: timestamp('updated_at').$defaultFn(() => /* @__PURE__ */ new Date())
+});
