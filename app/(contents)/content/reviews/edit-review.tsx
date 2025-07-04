@@ -69,7 +69,7 @@ export function EditReviewForm({ review, onSuccess }: EditReviewFormProps) {
                     name="name"
                     render={({ field }) => (
                         <FormItem>
-                            <FormLabel>Name</FormLabel>
+                            <FormLabel>Reviewer Name</FormLabel>
                             <FormControl>
                                 <Input {...field} />
                             </FormControl>
@@ -82,7 +82,7 @@ export function EditReviewForm({ review, onSuccess }: EditReviewFormProps) {
                     name="comment"
                     render={({ field }) => (
                         <FormItem>
-                            <FormLabel>Review</FormLabel>
+                            <FormLabel>Review Comment</FormLabel>
                             <FormControl>
                                 <Textarea {...field} rows={3} />
                             </FormControl>

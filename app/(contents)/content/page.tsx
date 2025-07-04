@@ -13,8 +13,8 @@ export default function ContentPage() {
             </div>
 
             <div className="grid gap-6 md:grid-cols-2">
-                <Card className="hover:bg-muted/50 transition-colors cursor-pointer">
-                    <Link href="/content/reviews">
+                <Link href="/content/reviews">
+                    <Card className="hover:bg-muted/50 transition-colors cursor-pointer">
                         <CardHeader>
                             <CardTitle className="flex items-center gap-2">
                                 <MessageSquare className="h-5 w-5" />
@@ -26,11 +26,10 @@ export default function ContentPage() {
                                 Manage and moderate customer reviews. Approve new reviews, respond to feedback, and maintain your online reputation.
                             </p>
                         </CardContent>
-                    </Link>
-                </Card>
-
-                <Card className="hover:bg-muted/50 transition-colors cursor-pointer">
-                    <Link href="/content/faqs">
+                    </Card>
+                </Link>
+                <Link href="/content/faqs">
+                    <Card className="hover:bg-muted/50 transition-colors cursor-pointer">
                         <CardHeader>
                             <CardTitle className="flex items-center gap-2">
                                 <HelpCircle className="h-5 w-5" />
@@ -42,10 +41,10 @@ export default function ContentPage() {
                                 Create and manage frequently asked questions. Help customers find answers to common questions about your services.
                             </p>
                         </CardContent>
-                    </Link>
-                </Card>
-                <Card className="hover:bg-muted/50 transition-colors cursor-pointer">
-                    <Link href="/content/images">
+                    </Card>
+                </Link>
+                <Link href="/content/images">
+                    <Card className="hover:bg-muted/50 transition-colors cursor-pointer">
                         <CardHeader>
                             <CardTitle className="flex items-center gap-2">
                                 <ImageIcon className="h-5 w-5" />
@@ -57,8 +56,8 @@ export default function ContentPage() {
                                 Upload and manage images. Showcase your services and products with high-quality images.
                             </p>
                         </CardContent>
-                    </Link>
-                </Card>
+                    </Card>
+                </Link>
             </div>
         </div>
     );
