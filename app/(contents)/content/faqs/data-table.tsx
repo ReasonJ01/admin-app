@@ -167,9 +167,8 @@ export function DataTable({
                 <div className="flex flex-col gap-2 w-full px-2">
                     <Drawer open={openSheetId === 'add'} onOpenChange={(open) => setOpenSheetId(open ? 'add' : null)}>
                         <DrawerTrigger asChild>
-                            <Button variant="default" className="w-full py-8 cursor-pointer font-semibold text-lg shadow-lg">
-                                <Plus className="h-6 w-6 mr-2" />
-                                Add New FAQ
+                            <Button variant="outline" className="w-full py-6 cursor-pointer">
+                                <Plus className="h-4 w-4" />
                             </Button>
                         </DrawerTrigger>
                         <DrawerContent className="p-6">
