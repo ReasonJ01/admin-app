@@ -1,0 +1,1 @@
+ALTER TABLE "image" ADD COLUMN "carousel" boolean DEFAULT false NOT NULL;
