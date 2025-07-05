@@ -55,7 +55,7 @@ export default function ImageUpload({ onUploadSuccess }: ImageUploadProps) {
             const blob = upload(file.file.name, file.file, {
                 access: 'public',
                 contentType: "image/*",
-                handleUploadUrl: "https://6773-86-29-152-158.ngrok-free.app/api/images/upload",
+                handleUploadUrl: "/api/images/upload",
                 clientPayload: file.key
             })
 
