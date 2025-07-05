@@ -1,10 +1,11 @@
 'use client'
 
-import { Upload } from "lucide-react";
+import { Trash, Upload, Loader2, Check, X, } from "lucide-react";
 import { Button } from "./ui/button";
 import { upload } from '@vercel/blob/client';
 import { useRef, useState } from "react";
 import Image from "next/image";
+import { type PutBlobResult } from '@vercel/blob';
 
 const generateImageKey = () => {
     const timestamp = Date.now();
@@ -18,8 +19,13 @@ interface UploadedFile {
     preview: string;
 }
 
-export default function ImageUpload() {
+interface ImageUploadProps {
+    onUploadSuccess?: (result: PutBlobResult) => void;
+}
+
+export default function ImageUpload({ onUploadSuccess }: ImageUploadProps) {
     const [files, setFiles] = useState<UploadedFile[]>([]);
+    const [uploadsStatus, setUploadsStatus] = useState<{ key: string, promise: Promise<PutBlobResult>, status: "pending" | "success" | "error", result?: PutBlobResult, error?: Error }[]>([]);
 
     const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -35,6 +41,8 @@ export default function ImageUpload() {
         }
     }
 
+
+
     async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault();
 
@@ -44,14 +52,29 @@ export default function ImageUpload() {
         }
 
         for (const file of files) {
-            await upload(file.file.name, file.file, {
+            const blob = upload(file.file.name, file.file, {
                 access: 'public',
                 contentType: "image/*",
-                handleUploadUrl: "/api/images/upload"
-
+                handleUploadUrl: "https://6773-86-29-152-158.ngrok-free.app/api/images/upload",
+                clientPayload: file.key
             })
+
+            setUploadsStatus(prev => [...prev, { key: file.key, promise: blob, status: "pending" }]);
+
+            blob.then((result) => {
+                setUploadsStatus(prev => prev.map(status => status.key === file.key ? { ...status, status: "success", result } : status));
+                setFiles(prev => prev.filter(f => f.key !== file.key));
+                onUploadSuccess?.(result);
+            }).catch((error) => {
+                setUploadsStatus(prev => prev.map(status => status.key === file.key ? { ...status, status: "error", error } : status));
+            });
+
         }
 
+    }
+
+    function handleRemove(key: string) {
+        setFiles(prev => prev.filter(file => file.key !== key));
     }
 
     return (
@@ -73,17 +96,50 @@ export default function ImageUpload() {
 
 
                 </div>
-                <div className="flex flex-col gap-4 mt-4">
-                    {files.map((uploadedFile) => (
-                        <div key={uploadedFile.key}>
-                            <Image src={uploadedFile.preview} alt={uploadedFile.file.name} width={100} height={100} />
-                            <p className="text-sm text-muted-foreground">{uploadedFile.file.name}</p>
-                            <p className="text-xs text-muted-foreground">Key: {uploadedFile.key}</p>
-                        </div>
-                    ))}
+                {files.length > 0 && (
+                    <div className="flex flex-wrap gap-4 mt-4 border-2 border-dashed rounded-lg p-4">
+                        {files.map((uploadedFile) => {
+                            const status = uploadsStatus.find(status => status.key === uploadedFile.key);
+                            const isUploading = status?.status === "pending";
+                            const isUploaded = status?.status === "success";
+                            const hasError = status?.status === "error";
 
-                </div>
-                <Button type="submit" className="mt-4">Upload</Button>
+                            return (
+                                <div key={uploadedFile.key} className="flex flex-col items-center justify-center relative">
+                                    <Image src={uploadedFile.preview} alt={uploadedFile.file.name} width={100} height={100} className={isUploading ? "opacity-50" : ""} />
+                                    <p className="text-sm text-muted-foreground">{uploadedFile.file.name}</p>
+
+                                    {isUploading && (
+                                        <div className="flex items-center gap-2 mt-2 text-sm text-blue-600 bg-blue-100 rounded px-2 py-1">
+                                            <Loader2 className="w-4 h-4 animate-spin" />
+                                            Uploading...
+                                        </div>
+                                    )}
+
+                                    {isUploaded && (
+                                        <div className="mt-2 text-sm text-green-700 bg-green-100 rounded px-2 py-1">
+                                            <Check className="w-4 h-4" /> Uploaded
+                                        </div>
+                                    )}
+
+                                    {hasError && (
+                                        <div className="mt-2 text-sm text-red-700 bg-red-100 rounded px-2 py-1">
+                                            <X className="w-4 h-4" /> {status?.error?.message || "Upload failed"}
+                                        </div>
+                                    )}
+
+                                    {!isUploading && !isUploaded && (
+                                        <Button variant="outline" size="sm" className="mt-2" onClick={() => handleRemove(uploadedFile.key)}>
+                                            <Trash className="w-4 h-4" />
+                                        </Button>
+                                    )}
+                                </div>
+                            );
+                        })}
+                    </div>
+                )}
+
+                <Button type="submit" disabled={files.length === 0 || uploadsStatus.some(status => status.status === "pending")} className="mt-4 w-full h-10">Upload</Button>
             </form>
         </div>
 

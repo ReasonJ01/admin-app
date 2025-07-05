@@ -75,5 +75,6 @@ export const image = pgTable("image", {
 	id: text('id').primaryKey(),
 	url: text('url').notNull(),
 	createdAt: timestamp('created_at').$defaultFn(() => /* @__PURE__ */ new Date()),
-	updatedAt: timestamp('updated_at').$defaultFn(() => /* @__PURE__ */ new Date())
+	updatedAt: timestamp('updated_at').$defaultFn(() => /* @__PURE__ */ new Date()),
+	carousel: boolean('carousel').default(false).notNull(),
 });
