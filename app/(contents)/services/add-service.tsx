@@ -161,7 +161,6 @@ export function AddServiceForm({ generalSettings, onSuccess }: AddServiceFormPro
                                         const val = e.target.value.replace(/\D/g, "").replace(/^0+/, "");
                                         field.onChange(val);
                                     }}
-                                    placeholder="15"
                                 />
                             </FormControl>
                             <FormMessage />
