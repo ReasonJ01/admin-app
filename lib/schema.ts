@@ -78,3 +78,20 @@ export const image = pgTable("image", {
 	updatedAt: timestamp('updated_at').$defaultFn(() => /* @__PURE__ */ new Date()),
 	carousel: boolean('carousel').default(false).notNull(),
 });
+
+export const service = pgTable("service", {
+	id: text().primaryKey().notNull(),
+	name: text().notNull(),
+	description: text().notNull(),
+	price: integer().notNull(),
+	duration: integer().notNull(),
+	preBufferMinutes: integer().notNull(),
+	postBufferMinutes: integer().notNull(),
+	overridePreBuffer: boolean().notNull().default(false),
+	overridePostBuffer: boolean().notNull().default(false),
+	hash: text().notNull(),
+	showOnWebsite: boolean().notNull().default(true),
+	createdAt: timestamp('created_at').$defaultFn(() => /* @__PURE__ */ new Date()),
+	updatedAt: timestamp('updated_at').$defaultFn(() => /* @__PURE__ */ new Date()),
+
+});

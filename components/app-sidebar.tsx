@@ -1,6 +1,6 @@
 "use client"
 
-import { Calendar, FileText, Home, Search, Settings } from "lucide-react"
+import { Calendar, FileText, Home, Search, Settings, Hand } from "lucide-react"
 import Link from "next/link"
 import {
     Sidebar,
@@ -26,6 +26,11 @@ const items = [
         title: "Appointments",
         url: "/appointments",
         icon: Calendar,
+    },
+    {
+        title: "Services",
+        url: "/services",
+        icon: Hand,
     },
     {
         title: "Site Content",

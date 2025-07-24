@@ -15,6 +15,34 @@
       "when": 1751729508188,
       "tag": "0001_sweet_ravenous",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1753271172318,
+      "tag": "0002_big_warpath",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1753292120669,
+      "tag": "0003_pale_captain_cross",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1753350905960,
+      "tag": "0004_chunky_black_panther",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1753350937156,
+      "tag": "0005_steep_scarlet_witch",
+      "breakpoints": true
     }
   ]
 }
