@@ -1,5 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { MessageSquare, HelpCircle, Image as ImageIcon } from "lucide-react";
+import { MessageSquare, HelpCircle, Image as ImageIcon, Calendar } from "lucide-react";
 import Link from "next/link";
 
 export default function ContentPage() {
@@ -58,7 +58,22 @@ export default function ContentPage() {
                         </CardContent>
                     </Card>
                 </Link>
+                <Link href="/content/booking-flow">
+                    <Card className="hover:bg-muted/50 transition-colors cursor-pointer">
+                        <CardHeader>
+                            <CardTitle className="flex items-center gap-2">
+                                <Calendar className="h-5 w-5" />
+                                Booking Flow
+                            </CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            <p className="text-sm text-muted-foreground">
+                                Manage and customize your booking flow.
+                            </p>
+                        </CardContent>
+                    </Card>
+                </Link>
             </div>
         </div>
     );
-} 
+}

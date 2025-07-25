@@ -95,3 +95,30 @@ export const service = pgTable("service", {
 	updatedAt: timestamp('updated_at').$defaultFn(() => /* @__PURE__ */ new Date()),
 
 });
+
+export const bookingFlowQuestion = pgTable("booking_flow_question", {
+	id: text('id').primaryKey(),
+	text: text('text').notNull(),
+	order: integer('order').default(0).notNull(),
+	createdAt: timestamp('created_at').$defaultFn(() => new Date()),
+	updatedAt: timestamp('updated_at').$defaultFn(() => new Date()),
+});
+
+export const bookingFlowOption = pgTable("booking_flow_option", {
+	id: text('id').primaryKey(),
+	questionId: text('question_id').notNull().references(() => bookingFlowQuestion.id, { onDelete: 'cascade' }),
+	optionTitle: text('option_title').notNull(),
+	description: text('description'),
+	nextQuestionId: text('next_question_id').references(() => bookingFlowQuestion.id, { onDelete: 'set null' }),
+	tag: text('tag'),
+	order: integer('order').default(0).notNull(),
+	createdAt: timestamp('created_at').$defaultFn(() => new Date()),
+	updatedAt: timestamp('updated_at').$defaultFn(() => new Date()),
+});
+
+export const bookingFlowOptionService = pgTable("booking_flow_option_service", {
+	optionId: text('option_id').notNull().references(() => bookingFlowOption.id, { onDelete: 'cascade' }),
+	serviceId: text('service_id').notNull().references(() => service.id, { onDelete: 'cascade' }),
+}, (table) => ({
+	pk: [table.optionId, table.serviceId],
+}));
