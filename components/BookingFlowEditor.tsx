@@ -3,15 +3,14 @@ import { getBookingFlowQuestionsWithOptions } from "@/lib/actions/booking_flow_a
 import { bookingFlowQuestion, bookingFlowOption, service } from "@/lib/schema";
 import { useEffect, useState } from "react";
 import { Button } from "./ui/button";
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "./ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "./ui/dialog";
 import { deleteBookingFlowQuestion } from "@/lib/actions/booking_flow_actions";
 import { createBookingFlowQuestion } from "@/lib/actions/booking_flow_actions";
 import { updateBookingFlowQuestion } from "@/lib/actions/booking_flow_actions";
-import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerFooter, DrawerClose } from "./ui/drawer";
+import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from "./ui/drawer";
 import { BookingFlowOptionForm, OptionFormValues } from "./BookingFlowOptionForm";
 import { createBookingFlowOption, updateBookingFlowOption, deleteBookingFlowOption } from "@/lib/actions/booking_flow_actions";
-import { QuestionEditor } from "./QuestionEditor";
 import { Badge } from "./ui/badge";
 import { Pencil, Trash2 } from "lucide-react";
 import { getServices } from "@/lib/actions/service_actions";
@@ -319,7 +318,7 @@ export default function BookingFlowEditor() {
                     <DialogHeader>
                         <DialogTitle>Delete Option</DialogTitle>
                     </DialogHeader>
-                    <p>Are you sure you want to delete the option "{optionToDelete?.optionTitle}"? This action cannot be undone.</p>
+                    <p>Are you sure you want to delete the option&quot;{optionToDelete?.optionTitle}&quot;? This action cannot be undone.</p>
                     <DialogFooter>
                         <Button variant="outline" onClick={() => setDeleteOptionModalOpen(false)}>Cancel</Button>
                         <Button variant="destructive" onClick={handleDeleteOption}>Delete</Button>
